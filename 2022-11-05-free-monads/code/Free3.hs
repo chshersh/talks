@@ -4,8 +4,8 @@
 
 module Free2 where
 
-import System.Directory (getDirectoryContents, getCurrentDirectory)
 import Data.Text (Text)
+import System.Directory (getCurrentDirectory, getDirectoryContents)
 
 import qualified Data.Text as Text
 import qualified Data.Text.IO as TextIO
@@ -30,13 +30,16 @@ runCommand cmd = case cmd of
 dryRunCommand :: Cmd -> [Text]
 dryRunCommand cmd = case cmd of
     Echo args next -> Text.unwords ("echo" : args) : dryRunCommand next
-    Ls next -> "ls -1a" : dryRunCommand (next ["dry-run-test-dir"])
-    Finish -> []
+    Ls next        -> "ls -1a" : dryRunCommand (next ["dry-run-test-dir"])
+    Finish         -> []
+
+dryRun :: Script -> IO ()
+dryRun = TextIO.putStr . Text.unlines . runScriptDryRun
 
 exampleScript :: Cmd
 exampleScript
     = Echo ["pancake", "honey"]
-    $ Ls 
+    $ Ls
     $ \dirs -> Echo dirs
     $ Echo ["Is", "this", "free", "monad?"]
     Finish

@@ -2,8 +2,8 @@
 
 module Free1 where
 
-import Data.Text (Text)
 import Data.Foldable (traverse_)
+import Data.Text (Text)
 
 import qualified Data.Text as Text
 import qualified Data.Text.IO as TextIO
@@ -22,6 +22,9 @@ runScript (Script commands) = traverse_ runCommand commands
 
 runScriptDryRun :: Script -> [Text]
 runScriptDryRun (Script commands) = map fmtCommand commands
+
+dryRun :: Script -> IO ()
+dryRun = TextIO.putStr . Text.unlines . runScriptDryRun
 
 fmtCommand :: Cmd -> Text
 fmtCommand cmd = case cmd of
