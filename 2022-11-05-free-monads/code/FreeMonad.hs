@@ -70,10 +70,10 @@ ls = liftF (Ls id)
 exampleScript :: Script Int
 exampleScript = do
     echo ["pancake", "honey"]
-    dirs <- ls
-    echo dirs
+    files <- ls
+    echo files
     echo ["Is", "this", "free", "monad?"]
-    pure $ length dirs
+    pure $ length files
 
 ------------------------------------------------------------------
 -- IO Interpreter
@@ -86,9 +86,9 @@ runCommand cmd = case cmd of
         pure next
     Ls getNext -> do
         curDir <- getCurrentDirectory
-        dirs <- getDirectoryContents curDir
-        let dirNames = map Text.pack dirs
-        pure $ getNext dirNames
+        files  <- getDirectoryContents curDir
+        let fileNames = map Text.pack files
+        pure $ getNext fileNames
 
 runScript :: Script a -> IO a
 runScript = foldFree runCommand
@@ -105,7 +105,7 @@ fmtCommand cmd = case cmd of
         pure next
     Ls next -> do
         tell ["ls -1a"]
-        pure $ next ["dry-run-test-dir"]
+        pure $ next ["dry-run-test-file"]
 
 dryRunCommand :: Script a -> [Text]
 dryRunCommand = execWriter . foldFree fmtCommand
@@ -142,7 +142,7 @@ dryRunCommand2 = freeFoldr split (:) (const [])
     split :: Cmd a -> (Text, a)
     split cmd = case cmd of
         Echo args next -> (Text.unwords ("echo" : args), next)
-        Ls next        -> ("ls -1a", next ["dry-run-test-dir"])
+        Ls next        -> ("ls -1a", next ["dry-run-test-file"])
 
 dryRun2 :: Script a -> IO ()
 dryRun2 = TextIO.putStr . Text.unlines . dryRunCommand2

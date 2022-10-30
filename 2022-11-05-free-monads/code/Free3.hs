@@ -22,24 +22,24 @@ runCommand cmd = case cmd of
         runCommand next
     Ls getNext -> do
         curDir <- getCurrentDirectory
-        dirs <- getDirectoryContents curDir
-        let dirNames = map Text.pack dirs
-        runCommand $ getNext dirNames
+        files <- getDirectoryContents curDir
+        let fileNames = map Text.pack files
+        runCommand $ getNext fileNames
     Finish -> pure ()
 
 dryRunCommand :: Cmd -> [Text]
 dryRunCommand cmd = case cmd of
     Echo args next -> Text.unwords ("echo" : args) : dryRunCommand next
-    Ls next        -> "ls -1a" : dryRunCommand (next ["dry-run-test-dir"])
+    Ls next        -> "ls -1a" : dryRunCommand (next ["dry-run-test-file"])
     Finish         -> []
 
-dryRun :: Script -> IO ()
-dryRun = TextIO.putStr . Text.unlines . runScriptDryRun
+dryRun :: Cmd -> IO ()
+dryRun = TextIO.putStr . Text.unlines . dryRunCommand
 
 exampleScript :: Cmd
 exampleScript
     = Echo ["pancake", "honey"]
     $ Ls
-    $ \dirs -> Echo dirs
+    $ \files -> Echo files
     $ Echo ["Is", "this", "free", "monad?"]
     Finish

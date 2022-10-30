@@ -20,8 +20,8 @@ runCommand cmd = case cmd of
     Echo args -> TextIO.putStrLn $ Text.unwords args
     Ls -> do
         curDir <- getCurrentDirectory
-        dirs <- getDirectoryContents curDir
-        TextIO.putStrLn $ Text.unlines $ map Text.pack dirs
+        files  <- getDirectoryContents curDir
+        TextIO.putStrLn $ Text.unlines $ map Text.pack files
 
 newtype Script = Script [Cmd]
 
